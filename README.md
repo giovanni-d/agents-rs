@@ -18,13 +18,13 @@ Drives a local GGUF model with one tool:
 
 ```sh
 # CPU
-cargo run --example hello --features llama-cpp --release
+cargo run --example calculator --features llama-cpp --release
 
 # NVIDIA GPU
-cargo run --example hello --features cuda --release
+cargo run --example calculator --features cuda --release
 
 # Apple Silicon
-cargo run --example hello --features metal --release
+cargo run --example calculator --features metal --release
 ```
 
 ```rust

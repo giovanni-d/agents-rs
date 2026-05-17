@@ -2,52 +2,51 @@
 //!
 //! Backends that drive a model via plain text (no native tool-calling API)
 //! instruct the model to emit JSON envelopes and parse them back here. The
-//! scanner finds every top-level balanced JSON value in the output; objects
-//! shaped like `{"tool": "<name>", "args": {...}}` become calls, arrays of
-//! such objects unfold into multiple calls, and anything else is ignored.
+//! scanner takes the **first** top-level balanced JSON value in the output —
+//! a single envelope object becomes one call, an array of envelopes becomes
+//! many. Anything after the first value is discarded; this dedupes the
+//! common failure mode where small instruct models repeat their JSON before
+//! end-of-turn.
 
 use serde_json::Value;
 
 use crate::agent::ToolCall;
 
-/// Scan `text` and return every tool-call envelope found, in order.
+/// Scan `text` and return the tool calls found in the first top-level JSON value.
 ///
 /// Accepted shapes (per the system-prompt contract this library uses):
 /// - `{"tool": "<name>", "args": {...}}` — one call.
 /// - `[{"tool": ..., "args": ...}, ...]` — many calls.
 ///
-/// The model may interleave prose with JSON; non-envelope JSON is dropped.
-/// Each returned call's `id` is its position in the result vector.
+/// Prose before the JSON is allowed. Any second JSON value the model emits
+/// after the first is dropped. Each returned call's `id` is its position in
+/// the result vector.
 pub fn extract_tool_calls(text: &str) -> Vec<ToolCall> {
     let bytes = text.as_bytes();
+    let Some(start) = bytes.iter().position(|&b| b == b'{' || b == b'[') else {
+        return Vec::new();
+    };
+    let Some(end) = balanced_end(bytes, start) else {
+        return Vec::new();
+    };
+    let Ok(value) = serde_json::from_str::<Value>(&text[start..end]) else {
+        return Vec::new();
+    };
     let mut calls: Vec<ToolCall> = Vec::new();
-    let mut cursor = 0;
-    while cursor < bytes.len() {
-        let Some(rel) = bytes[cursor..].iter().position(|&b| b == b'{' || b == b'[') else {
-            break;
-        };
-        let start = cursor + rel;
-        let Some(end) = balanced_end(bytes, start) else {
-            break;
-        };
-        if let Ok(value) = serde_json::from_str::<Value>(&text[start..end]) {
-            match value {
-                Value::Array(items) => {
-                    for item in items {
-                        if let Some(call) = call_from_value(&item, calls.len()) {
-                            calls.push(call);
-                        }
-                    }
+    match value {
+        Value::Array(items) => {
+            for item in items {
+                if let Some(call) = call_from_value(&item, calls.len()) {
+                    calls.push(call);
                 }
-                Value::Object(_) => {
-                    if let Some(call) = call_from_value(&value, calls.len()) {
-                        calls.push(call);
-                    }
-                }
-                _ => {}
             }
         }
-        cursor = end;
+        Value::Object(_) => {
+            if let Some(call) = call_from_value(&value, 0) {
+                calls.push(call);
+            }
+        }
+        _ => {}
     }
     calls
 }
@@ -132,9 +131,18 @@ mod tests {
     }
 
     #[test]
-    fn parses_two_concatenated_objects() {
+    fn drops_repeated_envelope_after_first() {
         let calls = extract_tool_calls(
             r#"{"tool":"a","args":{}} and then {"tool":"b","args":{"k":"v"}}"#,
+        );
+        assert_eq!(calls.len(), 1);
+        assert_eq!(calls[0].name, "a");
+    }
+
+    #[test]
+    fn drops_repeated_array_after_first() {
+        let calls = extract_tool_calls(
+            r#"[{"tool":"a","args":{}},{"tool":"b","args":{}}][{"tool":"a","args":{}},{"tool":"b","args":{}}]"#,
         );
         assert_eq!(calls.len(), 2);
         assert_eq!(calls[0].name, "a");
