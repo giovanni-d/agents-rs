@@ -11,9 +11,11 @@
 //! agent backed by llama.cpp.
 
 pub mod agent;
+pub mod caching;
 pub mod error;
 pub mod logging;
 pub mod message;
+pub mod retry;
 pub mod schema;
 pub mod stream;
 pub mod structured;
@@ -27,8 +29,10 @@ pub mod usage;
 pub mod llama;
 
 pub use agent::{Agent, FnAgent, Response, ToolCall, fn_agent};
+pub use caching::CachingAgent;
 pub use error::{AgentError, BoxFuture, Result};
 pub use logging::LoggingAgent;
+pub use retry::RetryAgent;
 pub use message::{ContentPart, Context, Message, MessageContent, Role};
 pub use stream::{
     BoxStreamingAgent, CharStreamAgent, Chunk, FailingStreamAgent, LoopEvent, StreamCollector,
