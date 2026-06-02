@@ -21,11 +21,11 @@ bytes = "1"
 base64 = "0.22"
 
 [dependencies.llama-cpp-2]
-git = "https://github.com/utilityai/llama-cpp-rs"
+path = "/Users/giovanni/Dev/llama-cpp-rs/llama-cpp-2"
 optional = true
 
 [dependencies.llama-cpp-sys-2]
-git = "https://github.com/utilityai/llama-cpp-rs"
+path = "/Users/giovanni/Dev/llama-cpp-rs/llama-cpp-sys-2"
 optional = true
 
 [dependencies.encoding_rs]

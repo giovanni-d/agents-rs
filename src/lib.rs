@@ -19,6 +19,7 @@ pub mod retry;
 pub mod schema;
 pub mod stream;
 pub mod structured;
+pub mod templates;
 pub mod tool;
 pub mod tool_loop;
 pub mod tool_parser;
