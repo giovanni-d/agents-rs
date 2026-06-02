@@ -1,6 +1,6 @@
 use agents_rs::{
-    AgentError, Context, FnTool, Response, StructuredOutput, ToolCall, ToolRegistry, fn_agent,
-    run_structured, run_with_tools,
+    AgentError, Context, FnTool, Response, SchemaKind, StructuredOutput, ToolCall, ToolDefinition,
+    ToolRegistry, fn_agent, run_structured, run_with_tools,
 };
 use serde::Deserialize;
 use serde_json::json;
@@ -9,10 +9,10 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 #[tokio::test]
 async fn tool_loop_runs_tool_then_returns_message() {
     let echo = FnTool::new(
-        "echo",
-        "Echo back the input.",
-        json!({ "type": "object" }),
-        |args| async move { Ok(args) },
+        ToolDefinition::builder("echo", "Echo back the input.")
+            .input(SchemaKind::map(SchemaKind::any()))
+            .build(),
+        |args: serde_json::Value| async move { Ok::<_, AgentError>(args) },
     );
     let registry = ToolRegistry::new().register(echo);
 

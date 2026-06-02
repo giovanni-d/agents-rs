@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 license = "MIT"
 description = "Minimal agent runtime: agents, tools, and structured output."
+autoexamples = false
 
 [lib]
 name = "agents_rs"
@@ -41,3 +42,18 @@ metal = ["llama-cpp", "llama-cpp-2/metal"]
 [dev-dependencies]
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[[example]]
+name = "calculator"
+path = "examples/calculator.rs"
+required-features = ["llama-cpp"]
+
+[[example]]
+name = "calculator_events"
+path = "examples/calculator_events.rs"
+required-features = ["llama-cpp"]
+
+[[example]]
+name = "stream_chat"
+path = "examples/stream_chat.rs"
+required-features = ["llama-cpp"]
