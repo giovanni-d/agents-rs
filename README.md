@@ -28,21 +28,31 @@ cargo run --example calculator --features metal --release
 ```
 
 ```rust
-use agents_rs::{Context, FnTool, LocalAgent, LocalConfig, ToolRegistry, run_with_tools};
-use serde_json::json;
+use agents_rs::{
+    Context, FnTool, LocalAgent, LocalConfig, SchemaKind, ToolDefinition, ToolRegistry,
+    run_with_tools,
+};
+use serde::{Deserialize, Serialize};
+
+#[derive(Deserialize)]
+struct AddArgs { a: i64, b: i64 }
+
+#[derive(Serialize)]
+struct AddResult { result: i64 }
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> agents_rs::Result<()> {
-    let add = FnTool::new(
-        "add",
-        "Add two integers and return their sum.",
-        json!({ "type": "object" }),
-        |args| async move {
-            let a = args["a"].as_i64().unwrap_or(0);
-            let b = args["b"].as_i64().unwrap_or(0);
-            Ok(json!({ "result": a + b }))
-        },
-    );
+    let def = ToolDefinition::builder("add", "Add two integers and return their sum.")
+        .input(
+            SchemaKind::object()
+                .field("a", SchemaKind::integer())
+                .field("b", SchemaKind::integer())
+                .build(),
+        )
+        .build();
+    let add = FnTool::new(def, |AddArgs { a, b }| async move {
+        Ok(AddResult { result: a + b })
+    });
     let registry = ToolRegistry::new().register(add);
 
     let agent = LocalAgent::from_config(
