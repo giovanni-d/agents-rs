@@ -25,7 +25,7 @@ pub mod llama;
 pub use agent::{Agent, FnAgent, Response, ToolCall, fn_agent};
 pub use error::{AgentError, BoxFuture, Result};
 pub use logging::LoggingAgent;
-pub use message::{Context, Message};
+pub use message::{ContentPart, Context, Message, MessageContent, Role};
 pub use structured::{StructuredOutput, run_structured};
 pub use tool::{FnTool, Tool, ToolRegistry};
 pub use tool_loop::run_with_tools;
