@@ -14,10 +14,12 @@ pub mod agent;
 pub mod error;
 pub mod logging;
 pub mod message;
+pub mod schema;
 pub mod structured;
 pub mod tool;
 pub mod tool_loop;
 pub mod tool_parser;
+pub mod tool_response;
 
 #[cfg(feature = "llama-cpp")]
 pub mod llama;
@@ -26,7 +28,14 @@ pub use agent::{Agent, FnAgent, Response, ToolCall, fn_agent};
 pub use error::{AgentError, BoxFuture, Result};
 pub use logging::LoggingAgent;
 pub use message::{ContentPart, Context, Message, MessageContent, Role};
-pub use structured::{StructuredOutput, run_structured};
+pub use schema::{
+    AgentData, EnumBuilder, GrammarSource, ObjectBuilder, SchemaField, SchemaKind,
+    SchemaValidationError, SchemaVariant, TypedAgent, TypedAgentAdapter, TypedAgentExt,
+};
+pub use structured::{
+    OutputFormat, OutputSchema, OutputSchemaRequest, StructuredOutput, run_structured,
+};
+pub use tool_response::{ToolResponse, ToolResult};
 pub use tool::{FnTool, Tool, ToolRegistry};
 pub use tool_loop::run_with_tools;
 pub use tool_parser::extract_tool_calls;
