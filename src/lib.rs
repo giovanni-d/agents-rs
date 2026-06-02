@@ -22,7 +22,6 @@ pub mod structured;
 pub mod templates;
 pub mod tool;
 pub mod tool_loop;
-pub mod tool_parser;
 pub mod tool_response;
 pub mod usage;
 
@@ -53,7 +52,6 @@ pub use tool::{
     fn_tool,
 };
 pub use tool_loop::{run_with_tools, run_with_tools_structured};
-pub use tool_parser::extract_tool_calls;
 pub use usage::UsageMetrics;
 
 #[cfg(feature = "llama-cpp")]
