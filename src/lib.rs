@@ -15,6 +15,7 @@ pub mod error;
 pub mod logging;
 pub mod message;
 pub mod schema;
+pub mod stream;
 pub mod structured;
 pub mod tool;
 pub mod tool_loop;
@@ -29,6 +30,11 @@ pub use agent::{Agent, FnAgent, Response, ToolCall, fn_agent};
 pub use error::{AgentError, BoxFuture, Result};
 pub use logging::LoggingAgent;
 pub use message::{ContentPart, Context, Message, MessageContent, Role};
+pub use stream::{
+    BoxStreamingAgent, CharStreamAgent, Chunk, FailingStreamAgent, LoopEvent, StreamCollector,
+    StreamingAgent, StreamingAgentExt, StreamingEchoAgent, ToolDispatchingAgent, ToolEvent,
+    WordStreamAgent, run_with_tools_streaming,
+};
 pub use schema::{
     AgentData, EnumBuilder, GrammarSource, ObjectBuilder, SchemaField, SchemaKind,
     SchemaValidationError, SchemaVariant, TypedAgent, TypedAgentAdapter, TypedAgentExt,
