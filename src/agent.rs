@@ -1,5 +1,4 @@
-//! The [`Agent`] trait and its [`Response`] shape, plus an [`FnAgent`]
-//! adapter so closures can be used wherever an agent is expected.
+//! The [`Agent`] trait, its [`Response`] shape, and an [`FnAgent`] closure adapter.
 
 use std::future::Future;
 

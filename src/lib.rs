@@ -20,6 +20,7 @@ pub mod tool;
 pub mod tool_loop;
 pub mod tool_parser;
 pub mod tool_response;
+pub mod usage;
 
 #[cfg(feature = "llama-cpp")]
 pub mod llama;
@@ -36,9 +37,13 @@ pub use structured::{
     OutputFormat, OutputSchema, OutputSchemaRequest, StructuredOutput, run_structured,
 };
 pub use tool_response::{ToolResponse, ToolResult};
-pub use tool::{FnTool, Tool, ToolRegistry};
-pub use tool_loop::run_with_tools;
+pub use tool::{
+    DynTool, FnTool, Tool, ToolDefinition, ToolDefinitionBuilder, ToolOutput, ToolRegistry,
+    fn_tool,
+};
+pub use tool_loop::{run_with_tools, run_with_tools_structured};
 pub use tool_parser::extract_tool_calls;
+pub use usage::UsageMetrics;
 
 #[cfg(feature = "llama-cpp")]
 pub use llama::{LocalAgent, LocalConfig};
